@@ -101,58 +101,56 @@
      transient = 290,
      volatile = 291,
      strictfp = 292,
-     LAB = 293,
-     RAB = 294,
-     LCB = 295,
-     RCB = 296,
-     LSB = 297,
-     RSB = 298,
-     LRB = 299,
-     RRB = 300,
-     QUESTIONMARK = 301,
-     AND = 302,
-     OR = 303,
-     LEFTSHIFT = 304,
-     RIGHTSHIFT = 305,
-     UNSIGNED_RIGHTSHIFT = 306,
-     LT = 307,
-     LTE = 308,
-     GT = 309,
-     GTE = 310,
-     for = 311,
-     if = 312,
-     else = 313,
-     switch = 314,
-     while = 315,
-     do = 316,
-     break = 317,
-     continue = 318,
-     COLON = 319,
-     throw = 320,
-     finally = 321,
-     EQUALS = 322,
-     ATTHERATE = 323,
-     TILD = 324,
-     catch = 325,
-     return = 326,
-     IDENTIFIER = 327,
-     throws = 328,
-     interface = 329,
-     new = 330,
-     try = 331,
-     super = 332,
-     instanceof = 333,
-     NOT = 334,
-     FloatingPointLiteral = 335,
-     IntegerLiteral = 336,
-     CharacterLiteral = 337,
-     BooleanLiteral = 338,
-     assert = 339,
-     StringLiteral = 340,
-     NullLiteral = 341,
-     extends = 342,
-     class = 343,
-     implements = 344
+     LCB = 293,
+     RCB = 294,
+     LSB = 295,
+     RSB = 296,
+     LRB = 297,
+     RRB = 298,
+     QUESTIONMARK = 299,
+     AND = 300,
+     OR = 301,
+     LEFTSHIFT = 302,
+     RIGHTSHIFT = 303,
+     UNSIGNED_RIGHTSHIFT = 304,
+     LT = 305,
+     LTE = 306,
+     GT = 307,
+     GTE = 308,
+     for = 309,
+     if = 310,
+     else = 311,
+     switch = 312,
+     while = 313,
+     do = 314,
+     break = 315,
+     continue = 316,
+     COLON = 317,
+     throw = 318,
+     finally = 319,
+     EQUALS = 320,
+     ATTHERATE = 321,
+     TILD = 322,
+     catch = 323,
+     RETURN = 324,
+     IDENTIFIER = 325,
+     throws = 326,
+     interface = 327,
+     new = 328,
+     try = 329,
+     super = 330,
+     instanceof = 331,
+     NOT = 332,
+     FloatingPointLiteral = 333,
+     IntegerLiteral = 334,
+     CharacterLiteral = 335,
+     BooleanLiteral = 336,
+     assert = 337,
+     StringLiteral = 338,
+     NullLiteral = 339,
+     extends = 340,
+     class = 341,
+     implements = 342
    };
 #endif
 /* Tokens.  */
@@ -191,58 +189,56 @@
 #define transient 290
 #define volatile 291
 #define strictfp 292
-#define LAB 293
-#define RAB 294
-#define LCB 295
-#define RCB 296
-#define LSB 297
-#define RSB 298
-#define LRB 299
-#define RRB 300
-#define QUESTIONMARK 301
-#define AND 302
-#define OR 303
-#define LEFTSHIFT 304
-#define RIGHTSHIFT 305
-#define UNSIGNED_RIGHTSHIFT 306
-#define LT 307
-#define LTE 308
-#define GT 309
-#define GTE 310
-#define for 311
-#define if 312
-#define else 313
-#define switch 314
-#define while 315
-#define do 316
-#define break 317
-#define continue 318
-#define COLON 319
-#define throw 320
-#define finally 321
-#define EQUALS 322
-#define ATTHERATE 323
-#define TILD 324
-#define catch 325
-#define return 326
-#define IDENTIFIER 327
-#define throws 328
-#define interface 329
-#define new 330
-#define try 331
-#define super 332
-#define instanceof 333
-#define NOT 334
-#define FloatingPointLiteral 335
-#define IntegerLiteral 336
-#define CharacterLiteral 337
-#define BooleanLiteral 338
-#define assert 339
-#define StringLiteral 340
-#define NullLiteral 341
-#define extends 342
-#define class 343
-#define implements 344
+#define LCB 293
+#define RCB 294
+#define LSB 295
+#define RSB 296
+#define LRB 297
+#define RRB 298
+#define QUESTIONMARK 299
+#define AND 300
+#define OR 301
+#define LEFTSHIFT 302
+#define RIGHTSHIFT 303
+#define UNSIGNED_RIGHTSHIFT 304
+#define LT 305
+#define LTE 306
+#define GT 307
+#define GTE 308
+#define for 309
+#define if 310
+#define else 311
+#define switch 312
+#define while 313
+#define do 314
+#define break 315
+#define continue 316
+#define COLON 317
+#define throw 318
+#define finally 319
+#define EQUALS 320
+#define ATTHERATE 321
+#define TILD 322
+#define catch 323
+#define RETURN 324
+#define IDENTIFIER 325
+#define throws 326
+#define interface 327
+#define new 328
+#define try 329
+#define super 330
+#define instanceof 331
+#define NOT 332
+#define FloatingPointLiteral 333
+#define IntegerLiteral 334
+#define CharacterLiteral 335
+#define BooleanLiteral 336
+#define assert 337
+#define StringLiteral 338
+#define NullLiteral 339
+#define extends 340
+#define class 341
+#define implements 342
 
 
 
@@ -252,6 +248,9 @@
 
 	#include <stdio.h>
 	#include <stdlib.h>
+	int yylex();
+	int yyerror();
+	extern FILE *yyin;
 
 
 /* Enabling traces.  */
@@ -285,7 +284,7 @@ typedef int YYSTYPE;
 
 
 /* Line 216 of yacc.c.  */
-#line 289 "yac.tab.c"
+#line 288 "yac.tab.c"
 
 #ifdef short
 # undef short
@@ -503,7 +502,7 @@ union yyalloc
 #define YYLAST   1
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  90
+#define YYNTOKENS  88
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  2
 /* YYNRULES -- Number of rules.  */
@@ -513,7 +512,7 @@ union yyalloc
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   344
+#define YYMAXUTOK   342
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -555,7 +554,7 @@ static const yytype_uint8 yytranslate[] =
       55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
       65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
       75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
-      85,    86,    87,    88,    89
+      85,    86,    87
 };
 
 #if YYDEBUG
@@ -569,13 +568,13 @@ static const yytype_uint8 yyprhs[] =
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      91,     0,    -1,    72,    -1
+      89,     0,    -1,    70,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    12,    12
+       0,    15,    15
 };
 #endif
 
@@ -589,11 +588,11 @@ static const char *const yytname[] =
   "MINUS", "MODULUS", "POWER", "this", "case", "default", "byte",
   "boolean", "short", "char", "int", "float", "double", "enum", "long",
   "public", "private", "protected", "abstract", "native", "synchronized",
-  "transient", "volatile", "strictfp", "LAB", "RAB", "LCB", "RCB", "LSB",
-  "RSB", "LRB", "RRB", "QUESTIONMARK", "AND", "OR", "LEFTSHIFT",
-  "RIGHTSHIFT", "UNSIGNED_RIGHTSHIFT", "LT", "LTE", "GT", "GTE", "for",
-  "if", "else", "switch", "while", "do", "break", "continue", "COLON",
-  "throw", "finally", "EQUALS", "ATTHERATE", "TILD", "catch", "return",
+  "transient", "volatile", "strictfp", "LCB", "RCB", "LSB", "RSB", "LRB",
+  "RRB", "QUESTIONMARK", "AND", "OR", "LEFTSHIFT", "RIGHTSHIFT",
+  "UNSIGNED_RIGHTSHIFT", "LT", "LTE", "GT", "GTE", "for", "if", "else",
+  "switch", "while", "do", "break", "continue", "COLON", "throw",
+  "finally", "EQUALS", "ATTHERATE", "TILD", "catch", "RETURN",
   "IDENTIFIER", "throws", "interface", "new", "try", "super", "instanceof",
   "NOT", "FloatingPointLiteral", "IntegerLiteral", "CharacterLiteral",
   "BooleanLiteral", "assert", "StringLiteral", "NullLiteral", "extends",
@@ -614,14 +613,14 @@ static const yytype_uint16 yytoknum[] =
      305,   306,   307,   308,   309,   310,   311,   312,   313,   314,
      315,   316,   317,   318,   319,   320,   321,   322,   323,   324,
      325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
-     335,   336,   337,   338,   339,   340,   341,   342,   343,   344
+     335,   336,   337,   338,   339,   340,   341,   342
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    90,    91
+       0,    88,    89
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
@@ -646,16 +645,16 @@ static const yytype_int8 yydefgoto[] =
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -73
+#define YYPACT_NINF -71
 static const yytype_int8 yypact[] =
 {
-     -72,   -73,     1,   -73
+     -70,   -71,     1,   -71
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -73,   -73
+     -71,   -71
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -670,14 +669,14 @@ static const yytype_uint8 yytable[] =
 
 static const yytype_uint8 yycheck[] =
 {
-      72,     0
+      70,     0
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,    72,    91,     0
+       0,    70,    89,     0
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1493,7 +1492,7 @@ yyreduce:
     {
       
 /* Line 1267 of yacc.c.  */
-#line 1497 "yac.tab.c"
+#line 1496 "yac.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1707,4 +1706,27 @@ yyreturn:
 }
 
 
+#line 739 "yac.y"
 
+
+int yyerror(char *msg)
+{
+//	printf("Invalid Expression\n");
+	return 1;
+}
+void main()
+{
+	printf("Enter the expression\n");
+	yyin = fopen("input.java", "r");
+	// yyin = stdin;
+do{
+	if(yyparse())	
+	{
+		printf("\nFailure");
+		exit(0);
+	}
+	}
+	while(!feof(yyin));
+	printf("Success");
+	
+}

@@ -2,9 +2,12 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
+	int yylex();
+	int yyerror();
+	extern FILE *yyin;
 %}
 
-%token DOT COMMA SEMICOLON package import static void final PLUS MULTIPLY DIVIDE MINUS MODULUS POWER this case default byte boolean short char int float double enum long public private protected abstract native synchronized transient volatile strictfp LAB RAB LCB RCB LSB RSB LRB RRB QUESTIONMARK AND OR LEFTSHIFT RIGHTSHIFT UNSIGNED_RIGHTSHIFT LT LTE GT GTE for if else switch while do break continue COLON throw finally EQUALS ATTHERATE TILD catch return IDENTIFIER throws interface new try super instanceof NOT FloatingPointLiteral IntegerLiteral CharacterLiteral BooleanLiteral assert StringLiteral NullLiteral extends class implements
+%token DOT COMMA SEMICOLON package import static void final PLUS MULTIPLY DIVIDE MINUS MODULUS POWER this case default byte boolean short char int float double enum long public private protected abstract native synchronized transient volatile strictfp LCB RCB LSB RSB LRB RRB QUESTIONMARK AND OR LEFTSHIFT RIGHTSHIFT UNSIGNED_RIGHTSHIFT LT LTE GT GTE for if else switch while do break continue COLON throw finally EQUALS ATTHERATE TILD catch RETURN IDENTIFIER throws interface new try super instanceof NOT FloatingPointLiteral IntegerLiteral CharacterLiteral BooleanLiteral assert StringLiteral NullLiteral extends class implements
 
 %% 
 
@@ -101,7 +104,7 @@ A15 : TypeArguments
 A16 : DOT Identifier A15 A16
 			|
 			;
-TypeArguments : LAB TypeArgument A17 RAB
+TypeArguments : LT TypeArgument A17 GT
 			;
 A17 : COMMA TypeArgument A17
 			|
@@ -115,20 +118,20 @@ A18 : extends ReferenceType
 			;
 
 // -----------------------------------------------
-NonWildcardTypeArguments : LAB TypeList RAB
+NonWildcardTypeArguments : LT TypeList GT
 			;
 TypeList : ReferenceType A19
 			;
 A19 : COMMA ReferenceType A19
 			|
 			;
-TypeArgumentsOrDiamond: LAB RAB
+TypeArgumentsOrDiamond: LT GT
 			| TypeArguments
 			;
-NonWildcardTypeArgumentsOrDiamonds : LAB RAB
+NonWildcardTypeArgumentsOrDiamonds : LT GT
 			| NonWildcardTypeArguments
 			;
-TypeParameters : LAB TypeParameter A20 RAB
+TypeParameters : LT TypeParameter A20 GT
 			;
 A20 : COMMA TypeParameter A20
 			|
@@ -383,7 +386,7 @@ Statement : Block
 			| for LRB ForControl RRB Statement
 			| break A57 SEMICOLON
 			| continue A57 SEMICOLON
-			| return A58 SEMICOLON
+			| RETURN A58 SEMICOLON
 			| throw Expression SEMICOLON
 			| synchronized ParExpression Block
 			| try Block Catches
@@ -733,4 +736,26 @@ A99 : LSB RSB
 A100 : default ElementValue
 			|
 			;
+%%
 
+int yyerror(char *msg)
+{
+//	printf("Invalid Expression\n");
+	return 1;
+}
+void main()
+{
+	printf("Enter the expression\n");
+	yyin = fopen("input.java", "r");
+	// yyin = stdin;
+do{
+	if(yyparse())	
+	{
+		printf("\nFailure");
+		exit(0);
+	}
+	}
+	while(!feof(yyin));
+	printf("Success");
+	
+}
