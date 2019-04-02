@@ -1,14 +1,19 @@
+%{
+	#include <stdio.h>
+	#include <stdlib.h>
+	int yylex();
+	int yyerror();
+	extern FILE *yyin;
+%}
 
-
-%token DOT COMMA SEMICOLON
-
+%token DOT COMMA SEMICOLON CBYTE CINT SHORT LONG CHAR FLOAT DOUBLE EXTENDS SUPER CLASS PUBLIC PROTECTED PRIVATE ABSTRACT IMPORT STATIC FINAL FINALLY STRICTPF VOLATILE TRANSIENT BOOLEAN IMPLEMENTS VOID THIS THROWS INTERFACE DEFAULT ATRATE INSTANCEOF QUESTION IF ELSE ASSERT NEW CASE SWITCH REF OR DIV EXP AND MUL LT GT TILDE NOT ID CHARACTERS INTEGER FLOATING CNULL FOR WHILE PLUS MINUS OCB OBB OB CCB CBB CB EQUALS MOD ENUM CONTINUE BREAK COLON RETURN CATCH SYNCHRONIZED THROW DO TRY PACKAGE NATIVE
 %% 
 // Packages 
 
 CompilationUnit :	OBB PackageDeclaration CBB OCB ImportDeclaration CCB OCB TypeDeclaration CCB
 					;
 
-PackageDeclaration :	OCB PackageModifier CCB package Identifier OCB  DOT Identifier CCB SEMICOLON
+PackageDeclaration :	OCB PackageModifier CCB PACKAGE Identifier OCB  DOT Identifier CCB SEMICOLON
 					;
 PackageModifier :	Annotation
 					; 
@@ -18,16 +23,16 @@ ImportDeclaration :	SingleTypeImportDeclaration
 				|	StaticImportOnDemandDeclaration
 				;
 
-SingleTypeImportDeclaration :	import TypeName SEMICOLON
+SingleTypeImportDeclaration :	IMPORT TypeName SEMICOLON
 								; 
 
-TypeImportOnDemandDeclaration :	import PackageOrTypeName DOT * SEMICOLON
+TypeImportOnDemandDeclaration :	IMPORT TypeName DOT MUL SEMICOLON
 								; 
 
-SingleStaticImportDeclaration :	import static TypeName DOT Identifier SEMICOLON
+SingleStaticImportDeclaration :	IMPORT STATIC TypeName DOT Identifier SEMICOLON
 								; 
 
-StaticImportOnDemandDeclaration :	import static TypeName DOT * SEMICOLON
+StaticImportOnDemandDeclaration :	IMPORT STATIC TypeName DOT MUL SEMICOLON
 									; 
 
 TypeDeclaration :	ClassDeclaration
@@ -37,59 +42,54 @@ TypeDeclaration :	ClassDeclaration
 
 // Lexical Structure 
 
-Literal :	IntegerLiteral
-		|	FloatingPointLiteral
-		|	BooleanLiteral
-		|	CharacterLiteral
-		|	StringLiteral
-		|	NullLiteral
+Literal :	INTEGER
+		|	FLOATING
+		|	BOOLEAN
+		|	ID
+		|	CNULL
 		;
+
+Identifier : ID 
+			; 
 
 // Types COMMA Values and Variables 
 
-
-Type :	PrimitiveType
-	|	ReferenceType
-	;
-
 PrimitiveType :	OCB Annotation CCB NumericType
-			|	OCB Annotation CCB boolean
+			|	OCB Annotation CCB BOOLEAN
 			;
 
 NumericType :	IntegralType
 			|	FloatingPointType
 			;
 
-IntegralType :	byte
-			|	short
-			|	int
-			|	long
-			|	char
+IntegralType :	CBYTE
+			|	SHORT
+			|	CINT 
+			|	LONG
+			|	CHAR
 			;
 
-FloatingPointType : float
-				|	 double
+FloatingPointType : FLOAT 
+				|	 DOUBLE 
 				;
 
-ReferenceType:	ClassOrInterfaceType
+ReferenceType :	ClassType
 			|	TypeVariable
 			|	ArrayType
 			;
 
-ClassOrInterfaceType :	ClassType
-					|	InterfaceType
+
 
 ClassType :		OCB Annotation CCB Identifier OBB TypeArguments OCB
-			|	ClassOrInterfaceType DOT OCB Annotation CCB Identifier OBB TypeArguments OCB
+			|	ClassType DOT OCB Annotation CCB Identifier OBB TypeArguments OCB
 			;
 
-InterfaceType :	ClassType
 
 TypeVariable :	OCB Annotation CCB Identifier
 			;
 
 ArrayType :		PrimitiveType Dims
-			|	ClassOrInterfaceType Dims
+			|	ClassType Dims
 			|	TypeVariable Dims 
 			;
 
@@ -102,11 +102,11 @@ TypeParameter :	OCB TypeParameterModifier CCB Identifier OBB TypeBound CBB
 TypeParameterModifier :	Annotation
 			;
 
-TypeBound :	extends TypeVariable
-		|	extends ClassOrInterfaceType OCB AdditionalBound CCB
+TypeBound :	EXTENDS TypeVariable
+		|	EXTENDS ClassType OCB AdditionalBound CCB
 		;
 
-AdditionalBound :	AND InterfaceType
+AdditionalBound :	AND ClassType
 		;
 
 TypeArguments :	LT TypeArgumentList GT
@@ -120,34 +120,22 @@ TypeArgument :	ReferenceType
 
 Wildcard :	OCB Annotation CCB QUESTION OBB WildcardBounds CBB
 
-WildcardBounds :	extends ReferenceType
-			|	super ReferenceType
+WildcardBounds :	EXTENDS ReferenceType
+			|	SUPER ReferenceType
 			;
 
 
 // Names 
 
 TypeName :	Identifier
-		|	PackageOrTypeName DOT Identifier
+		|	TypeName DOT Identifier
 		;
 
-PackageOrTypeName :	Identifier
-				| PackageOrTypeName DOT Identifier
-				;
-
 ExpressionName :	Identifier
-				|	AmbiguousName DOT Identifier
+				|	ExpressionName DOT Identifier
 				;
 
 MethodName :	Identifier
-			;
-
-PackageName :	Identifier
-			|	PackageName DOT Identifier
-			;
-
-AmbiguousName :	Identifier
-			|	AmbiguousName DOT Identifier
 			;
 
 
@@ -158,275 +146,279 @@ ClassDeclaration :	NormalClassDeclaration
 				|	EnumDeclaration
 				;
 
-NormalClassDeclaration :	OCB ClassModifier CCB class Identifier OBB TypeParameters CBB OBB Superclass CBB OBB Superinterfaces CBB ClassBody
+NormalClassDeclaration :	OCB ClassModifier CCB CLASS Identifier OBB TypeParameters CBB OBB Superclass CBB OBB Superinterfaces CBB ClassBody
 					;
 
-ClassModifier :	 Annotation public protected private
-			|	abstract static final strictfp
+ClassModifier :	 ABSTRACT 
+			| STATIC 
+			| FINAL 
+			| STRICTPF
+			| Security
 			;
 
-TypeParameters :	< TypeParameterList >
+TypeParameters :	LT TypeParameterList GT
 				;
 
 TypeParameterList :	TypeParameter OCB  COMMA TypeParameter CCB
 				;
 
-Superclass :	extends ClassType
+Superclass :	EXTENDS ClassType
 			; 
 
-Superinterfaces:	implements InterfaceTypeList
+Superinterfaces : 	IMPLEMENTS InterfaceTypeList
 			; 
 
-InterfaceTypeList:	InterfaceType OCB  COMMA InterfaceType CCB
+InterfaceTypeList :	ClassType OCB  COMMA ClassType CCB
 			 ;
 
-ClassBody:	OCB  OCB ClassBodyDeclaration CCB  CCB
+ClassBody :	OCB  OCB ClassBodyDeclaration CCB  CCB
 			; 
 
-ClassBodyDeclaration:	ClassMemberDeclaration
+ClassBodyDeclaration :	ClassMemberDeclaration
 					|	InstanceInitializer
 					|	StaticInitializer
 					|	ConstructorDeclaration
 					;
 
 
-ClassMemberDeclaration:	FieldDeclaration
+ClassMemberDeclaration :	FieldDeclaration
 					|	MethodDeclaration
 					|	ClassDeclaration
 					|	InterfaceDeclaration
 					|	SEMICOLON
 					;
 
-FieldDeclaration:	OCB FieldModifier CCB UnannType VariableDeclaratorList ;
+FieldDeclaration :	OCB FieldModifier CCB UnannType VariableDeclaratorList ;
 					 ; 
 
-FieldModifier:	Annotation public protected private
-			|	static final transient volatile
+FieldModifier :	Annotation 
+			|	PUBLIC 
+			|	PROTECTED 
+			|	PRIVATE
+			|	STATIC 
+			|	FINAL
+			| 	TRANSIENT
+			| 	VOLATILE
 			;
 
-VariableDeclaratorList:	VariableDeclarator OCB  COMMA VariableDeclarator CCB
+VariableDeclaratorList :	VariableDeclarator OCB  COMMA VariableDeclarator CCB
 					; 
 
-VariableDeclarator:	VariableDeclaratorId OBB  = VariableInitializer CBB
+VariableDeclarator :	VariableDeclaratorId OBB   EQUALS VariableInitializer CBB
 					; 
 
-VariableDeclaratorId:	Identifier OBB Dims CBB
+VariableDeclaratorId :	Identifier OBB Dims CBB
 					; 
 
-VariableInitializer:	Expression
+VariableInitializer :	Expression
 					|	ArrayInitializer
 					; 
 
-UnannType:	UnannPrimitiveType
+UnannType :	UnannPrimitiveType
 		|	UnannReferenceType
 		; 
 
-UnannPrimitiveType:	NumericType
-				|	boolean
+UnannPrimitiveType :	NumericType
+				|	BOOLEAN
 				;
 
-UnannReferenceType:	UnannClassOrInterfaceType
+UnannReferenceType :	UnannClassType
 				|	UnannTypeVariable
 				|	UnannArrayType
 				;
 
-UnannClassOrInterfaceType:	UnannClassType
-						|	UnannInterfaceType
-						;
 
-UnannClassType:	Identifier OBB TypeArguments CBB
-			|	UnannClassOrInterfaceType DOT OCB Annotation CCB Identifier OBB TypeArguments CBB
+UnannClassType :	Identifier OBB TypeArguments CBB
+			|	UnannClassType DOT OCB Annotation CCB Identifier OBB TypeArguments CBB
 			;
 
-UnannInterfaceType:	UnannClassType
+UnannTypeVariable :	Identifier
 				; 
 
-UnannTypeVariable:	Identifier
-				; 
-
-UnannArrayType:	UnannPrimitiveType Dims
-			|	UnannClassOrInterfaceType Dims
+UnannArrayType :	UnannPrimitiveType Dims
+			|	UnannClassType Dims
 			|	UnannTypeVariable Dims
 			;
 
 
-MethodDeclaration:	OCB MethodModifier CCB MethodHeader MethodBody
+MethodDeclaration :	OCB MethodModifier CCB MethodHeader MethodBody
 				; 
 
-MethodModifier:	Annotation public protected private
-			|	abstract static final synchronized native strictfp
+MethodModifier :	ABSTRACT 
+				|	STATIC 
+				|	FINAL 
+				|	SYNCHRONIZED
+				|	NATIVE
+				|	STRICTPF
+				| 	Security
 			; 
+			
+Security		:	Annotation 
+				|	PUBLIC
+				|	PROTECTED
+				|	PRIVATE
+				; 
 
-MethodHeader:	Result MethodDeclarator OBB Throws CBB
+MethodHeader :	Result MethodDeclarator OBB Throws CBB
 			|	TypeParameters OCB Annotation CCB Result MethodDeclarator OBB Throws CBB
 			; 
 
-Result:	UnannType
-	|	void
+Result :	UnannType
+	|	VOID
 	; 
 
-MethodDeclarator:	Identifier ( OBB FormalParameterList CBB ) OBB Dims CBB
+MethodDeclarator :	Identifier OB OBB FormalParameterList CBB CB OBB Dims CBB
 			; 
 
-FormalParameterList:	ReceiverParameter
+FormalParameterList :	ReceiverParameter
 					|	FormalParameters COMMA LastFormalParameter
 					|	LastFormalParameter
 					;
 
-FormalParameters:	FormalParameter OCB  COMMA FormalParameter CCB
+FormalParameters :	FormalParameter OCB  COMMA FormalParameter CCB
 				|	ReceiverParameter OCB  COMMA FormalParameter CCB
 				;
 
-FormalParameter:	OCB VariableModifier CCB UnannType VariableDeclaratorId
+FormalParameter :	OCB VariableModifier CCB UnannType VariableDeclaratorId
 					; 
 
 VariableModifier :	Annotation
-				|	final
+				|	FINAL
 				;
 
-LastFormalParameter:	OCB VariableModifier CCB UnannType OCB Annotation CCB DOT VariableDeclaratorId
+LastFormalParameter :	OCB VariableModifier CCB UnannType OCB Annotation CCB DOT VariableDeclaratorId
 					|	FormalParameter
 					;
 
-ReceiverParameter:	OCB Annotation CCB UnannType OBB Identifier DOT  CBB this
+ReceiverParameter :	OCB Annotation CCB UnannType OBB Identifier DOT  CBB THIS
 					; 
 
 
-Throws:	throws
+Throws :	THROWS
 	|	ExceptionTypeList
 	;
 
-ExceptionTypeList:	ExceptionType OCB  COMMA ExceptionType CCB
+ExceptionTypeList :	ExceptionType OCB  COMMA ExceptionType CCB
 			; 
 
-ExceptionType:	ClassType
+ExceptionType :	ClassType
 			|	TypeVariable
 			; 
 
-MethodBody:	Block
+MethodBody :	Block
 		|	SEMICOLON
 		; 
 
-InstanceInitializer:	Block
+InstanceInitializer :	Block
 					; 
 
-StaticInitializer:	static Block
+StaticInitializer :	STATIC Block
 					; 
 
-ConstructorDeclaration:	OCB ConstructorModifier CCB ConstructorDeclarator OBB Throws CBB ConstructorBody
+ConstructorDeclaration :	OCB ConstantModifier CCB ConstructorDeclarator OBB Throws CBB ConstructorBody
 						; 
 
-ConstructorModifier:	Annotation 
-					|	public 
-					|	protected 
-					|	private
-						;
-
-ConstructorDeclarator:	OBB TypeParameters CBB SimpleTypeName ( OBB FormalParameterList CBB )
+ConstructorDeclarator :	OBB TypeParameters CBB SimpleTypeName OB OBB FormalParameterList CBB CB
 						; 
 
-SimpleTypeName:	Identifier
+SimpleTypeName :	Identifier
 				; 
 
-ConstructorBody:	OCB  OBB ExplicitConstructorInvocation CBB OBB BlockStatements CBB  CCB
+ConstructorBody :	OCB  OBB ExplicitConstructorInvocation CBB OBB BlockStatements CBB  CCB
 				;  
 
-ExplicitConstructorInvocation:	OBB TypeArguments CBB this ( OBB ArgumentList CBB ) SEMICOLON
-							|	OBB TypeArguments CBB super ( OBB ArgumentList CBB ) SEMICOLON
-							|	ExpressionName DOT OBB TypeArguments CBB super ( OBB ArgumentList CBB ) SEMICOLON
-							|	Primary DOT OBB TypeArguments CBB super ( OBB ArgumentList CBB ) SEMICOLON
+ExplicitConstructorInvocation :	OBB TypeArguments CBB THIS OB OBB ArgumentList CBB CB SEMICOLON
+							|	OBB TypeArguments CBB SUPER OB OBB ArgumentList CBB CB SEMICOLON
+							|	ExpressionName DOT OBB TypeArguments CBB SUPER OB OBB ArgumentList CBB CB SEMICOLON
+							|	Primary DOT OBB TypeArguments CBB SUPER OB OBB ArgumentList CBB CB SEMICOLON
 							; 
 
-EnumDeclaration:	OCB ClassModifier CCB enum Identifier OBB Superinterfaces CBB EnumBody
+EnumDeclaration :	OCB ClassModifier CCB ENUM Identifier OBB Superinterfaces CBB EnumBody
 					; 
 
-EnumBody:	OCB  OBB EnumConstantList CBB OBB  COMMA  CBB OBB EnumBodyDeclarations CBB  CCB		
+EnumBody :	OCB  OBB EnumConstantList CBB OBB  COMMA  CBB OBB EnumBodyDeclarations CBB  CCB		
 			; 
 
-EnumConstantList:	EnumConstant OCB  COMMA EnumConstant CCB
+EnumConstantList :	EnumConstant OCB  COMMA EnumConstant CCB
 				; 
 
-EnumConstant:	OCB EnumConstantModifier CCB Identifier OBB  ( OBB ArgumentList CBB )  CBB OBB ClassBody CBB
+EnumConstant :	OCB Annotation CCB Identifier OBB  OB OBB ArgumentList CBB CB  CBB OBB ClassBody CBB
 				; 
 
-EnumConstantModifier:	Annotation
-				; 
-
-EnumBodyDeclarations:	SEMICOLON OCB ClassBodyDeclaration CCB
+EnumBodyDeclarations :	SEMICOLON OCB ClassBodyDeclaration CCB
 				; 
 
 // Interfaces 
 
 
-InterfaceDeclaration:	NormalInterfaceDeclaration
+InterfaceDeclaration :	NormalInterfaceDeclaration
 					|	AnnotationTypeDeclaration
 					; 
 
-NormalInterfaceDeclaration:	{InterfaceModifier} interface Identifier [TypeParameters]
-						|	[ExtendsInterfaces] InterfaceBody
+NormalInterfaceDeclaration :	OCB InterfaceModifier CCB INTERFACE Identifier OBB TypeParameters CBB
+						|	OBB ExtendsInterfaces CBB InterfaceBody
 						; 
 
-InterfaceModifier:	Annotation 
-				|	public 
-				|	protected 
-				|	private
-				|	abstract
-				|	static 
-				|	strictfp
+InterfaceModifier :	
+				|	ABSTRACT
+				|	STATIC 
+				|	STRICTPF
+				| 	Security
 				; 
 
-ExtendsInterfaces:	extends InterfaceTypeList
+ExtendsInterfaces :	EXTENDS InterfaceTypeList
 					; 
 
-InterfaceBody:	{ {InterfaceMemberDeclaration} }
+InterfaceBody :	OCB  OCB InterfaceMemberDeclaration CCB  CCB
+				; 
 
-InterfaceMemberDeclaration:	ConstantDeclaration
+InterfaceMemberDeclaration :	ConstantDeclaration
 						|	InterfaceMethodDeclaration
 						|	ClassDeclaration
 						|	InterfaceDeclaration
 						|	SEMICOLON
 						;
 
-ConstantDeclaration:	{ConstantModifier} UnannType VariableDeclaratorList SEMICOLON
+ConstantDeclaration :	OCB ConstantModifier CCB UnannType VariableDeclaratorList SEMICOLON
 					; 
-ConstantModifier:	Annotation 
-				|	public
-				|	static
-				|	final
+ConstantModifier :	Annotation 
+				|	PUBLIC
+				|	STATIC
+				|	FINAL
 				; 
 
-InterfaceMethodDeclaration:	{InterfaceMethodModifier} MethodHeader MethodBody	
+InterfaceMethodDeclaration :	OCB InterfaceMethodModifier CCB MethodHeader MethodBody	
 					; 
 
-InterfaceMethodModifier:	Annotation 
-						|	public
-						|	abstract
-						|	default
-						|	static
-						|	strictfp
+InterfaceMethodModifier :	Annotation 
+						|	PUBLIC
+						|	ABSTRACT
+						|	DEFAULT
+						|	STATIC
+						|	STRICTPF
 						; 
 
-AnnotationTypeDeclaration:	{InterfaceModifier} @ interface Identifier AnnotationTypeBody
+AnnotationTypeDeclaration :	OCB InterfaceModifier CCB ATRATE INTERFACE Identifier AnnotationTypeBody
 						; 
 
-AnnotationTypeBody:	{ {AnnotationTypeMemberDeclaration} }
-					; 
-AnnotationTypeMemberDeclaration:	AnnotationTypeElementDeclaration
+AnnotationTypeBody :	OCB  OCB AnnotationTypeMemberDeclaration CCB  CCB
+					;  
+AnnotationTypeMemberDeclaration :	AnnotationTypeElementDeclaration
 								|	ConstantDeclaration
 								|	ClassDeclaration
 								|	InterfaceDeclaration
 								|	SEMICOLON
 								; 
 
-AnnotationTypeElementDeclaration:	{AnnotationTypeElementModifier} UnannType Identifier ( ) [Dims] [DefaultValue] SEMICOLON
+AnnotationTypeElementDeclaration :	OCB AnnotationTypeElementModifier CCB UnannType Identifier OB CB OBB Dims CBB OBB DefaultValue CBB SEMICOLON
 								; 
 
-AnnotationTypeElementModifier:	Annotation
-							|	public
-							|	abstract
+AnnotationTypeElementModifier :	Annotation
+							|	PUBLIC
+							|	ABSTRACT
 							; 
 
-DefaultValue:	default ElementValue
+DefaultValue:	DEFAULT ElementValue
 				; 
 
 Annotation :	NormalAnnotation
@@ -434,359 +426,471 @@ Annotation :	NormalAnnotation
 		|	SingleElementAnnotation
 		; 
 
-NormalAnnotation :	@ TypeName ( [ElementValuePairList] )
+NormalAnnotation :	ATRATE TypeName OB OBB ElementValuePairList CBB CB
 					; 
 
-ElementValuePairList :	ElementValuePair { , ElementValuePair}
+ElementValuePairList :	ElementValuePair OCB  COMMA ElementValuePair CCB
 					; 
 
-ElementValuePair :	Identifier = ElementValue
+ElementValuePair :	Identifier  EQUALS ElementValue
 					; 
 
-ElementValue:	ConditionalExpression
+ElementValue :	ConditionalExpression
 			|	ElementValueArrayInitializer
 			|	Annotation
 			; 
 
-ElementValueArrayInitializer:	{ [ElementValueList] [ , ] }
+ElementValueArrayInitializer :	OCB  OBB ElementValueList CBB OBB  COMMA  CBB  CCB
 						; 
 
-ElementValueList:	ElementValue { , ElementValue}
+ElementValueList :	ElementValue OCB  COMMA ElementValue CCB
 					; 
 
-MarkerAnnotation:	@ SimpleTypeName
+MarkerAnnotation :	ATRATE SimpleTypeName
 					; 
 
-SingleElementAnnotation:	@ TypeName ( ElementValue )
+SingleElementAnnotation :	ATRATE TypeName OB ElementValue CB
 					; 
 
 // Arrays 
-ArrayInitializer:	{ [VariableInitializerList] [ , ] }
+ArrayInitializer :	OCB  OBB VariableInitializerList CBB OBB  COMMA  CBB  CCB
 				; 
 
-VariableInitializerList:	VariableInitializer { , VariableInitializer}
+VariableInitializerList :	VariableInitializer OCB  COMMA VariableInitializer CCB
 				; 
 
 // Blocks 
 
-Block:	{ [BlockStatements] }
+Block :	OCB  OBB BlockStatements CBB  CCB
+	; 
 
-BlockStatements:	BlockStatement {BlockStatement}
+BlockStatements :	BlockStatement OCB BlockStatement CCB
+	; 
 
-BlockStatement:	LocalVariableDeclarationStatement
-ClassDeclaration
-Statement
+BlockStatement :	LocalVariableDeclarationStatement
+			|	ClassDeclaration
+			|	Statement
+			; 
+LocalVariableDeclarationStatement :	LocalVariableDeclaration SEMICOLON
+									; 	
 
-LocalVariableDeclarationStatement:	LocalVariableDeclaration ;
+LocalVariableDeclaration :	OCB VariableModifier CCB UnannType VariableDeclaratorList
+							; 
 
-LocalVariableDeclaration:	{VariableModifier} UnannType VariableDeclaratorList
+Statement :	StatementWithoutTrailingSubstatement
+		|	LabeledStatement
+		|	IfThenStatement
+		|	IfThenElseStatement
+		|	WhileStatement
+		|	ForStatement
+		; 
 
-Statement:	StatementWithoutTrailingSubstatement
-LabeledStatement
-IfThenStatement
-IfThenElseStatement
-WhileStatement
-ForStatement
+StatementNoShortIf :	StatementWithoutTrailingSubstatement
+				|	LabeledStatementNoShortIf
+				|	IfThenElseStatementNoShortIf
+				|	WhileStatementNoShortIf
+				|	ForStatementNoShortIf
+				;  
 
-StatementNoShortIf:	StatementWithoutTrailingSubstatement
-LabeledStatementNoShortIf
-IfThenElseStatementNoShortIf
-WhileStatementNoShortIf
-ForStatementNoShortIf
+StatementWithoutTrailingSubstatement :	Block
+									| 	EmptyStatement
+									| 	ExpressionStatement
+									|	AssertStatement
+									|	SwitchStatement
+									|	DoStatement
+									|	BreakStatement
+									|	ContinueStatement
+									|	ReturnStatement
+									|	SynchronizedStatement
+									|	ThrowStatement
+									|	TryStatement
+									; 
 
+EmptyStatement :	SEMICOLON
+				; 
 
-StatementWithoutTrailingSubstatement:	Block
-EmptyStatement
-ExpressionStatement
-AssertStatement
-SwitchStatement
-DoStatement
-BreakStatement
-ContinueStatement
-ReturnStatement
-SynchronizedStatement
-ThrowStatement
-TryStatement
+LabeledStatement :	Identifier COLON Statement	
+				; 
 
-EmptyStatement:	;
+LabeledStatementNoShortIf :	Identifier COLON StatementNoShortIf	
+				; 
 
-LabeledStatement:	Identifier : Statement	LabeledStatementNoShortIf:	Identifier : StatementNoShortIf	ExpressionStatement:	StatementExpression ;
+ExpressionStatement :	StatementExpression SEMICOLON
 
 StatementExpression:	Assignment
-PreIncrementExpression
-PreDecrementExpression
-PostIncrementExpression
-PostDecrementExpression
-MethodInvocation
-ClassInstanceCreationExpression
+					|	PreIncrementExpression
+					|	PreDecrementExpression
+					|	PostIncrementExpression
+					|	PostDecrementExpression
+					|	MethodInvocation
+					|	ClassInstanceCreationExpression
+					; 
+
+IfThenStatement : 	IF OB Expression CB Statement
+				; 
+
+IfThenElseStatement :	IF OB Expression CB StatementNoShortIf ELSE Statement
+					; 
+
+IfThenElseStatementNoShortIf :	IF OB Expression CB StatementNoShortIf ELSE StatementNoShortIf
+					; 
+
+AssertStatement :	ASSERT Expression SEMICOLON
+				|	ASSERT Expression COLON Expression SEMICOLON
+				; 
+
+SwitchStatement :	SWITCH OB Expression CB SwitchBlock
+				; 
+
+SwitchBlock :	OCB  OCB SwitchBlockStatementGroup CCB OCB SwitchLabel CCB  CCB
+				; 
+
+SwitchBlockStatementGroup :	SwitchLabels BlockStatements
+							; 
+
+SwitchLabels :	SwitchLabel OCB SwitchLabel CCB
+				; 
+
+SwitchLabel :	CASE Expression COLON
+			|	CASE Identifier COLON	
+			|	DEFAULT COLON
+			; 
 
 
-IfThenStatement:	if ( Expression ) Statement
 
-IfThenElseStatement:	if ( Expression ) StatementNoShortIf else Statement
+WhileStatement :	WHILE OB Expression CB Statement
+				; 
 
-IfThenElseStatementNoShortIf:	if ( Expression ) StatementNoShortIf else StatementNoShortIf
+WhileStatementNoShortIf :	WHILE OB Expression CB StatementNoShortIf
+				; 
 
-AssertStatement:	assert Expression ;
+DoStatement :	DO Statement WHILE OB Expression CB SEMICOLON
+				; 
 
-assert Expression : Expression ;	SwitchStatement:	switch ( Expression ) SwitchBlock
+ForStatement :	BasicForStatement
+			|	EnhancedForStatement
+			; 
 
-SwitchBlock:	{ {SwitchBlockStatementGroup} {SwitchLabel} }
+ForStatementNoShortIf :	BasicForStatementNoShortIf
+					|	EnhancedForStatementNoShortIf
+					; 
 
-SwitchBlockStatementGroup:	SwitchLabels BlockStatements
+BasicForStatement :	FOR OB OBB ForInit CBB SEMICOLON OBB Expression CBB SEMICOLON OBB ForUpdate CBB CB Statement
+					; 
 
-SwitchLabels:	SwitchLabel {SwitchLabel}
+BasicForStatementNoShortIf :	FOR OB OBB ForInit CBB SEMICOLON OBB Expression CBB SEMICOLON OBB ForUpdate CBB CB StatementNoShortIf
+					; 
 
-SwitchLabel:	case ConstantExpression :	case EnumConstantName :	default :	EnumConstantName:	Identifier
+ForInit :	StatementExpressionList
+		|	LocalVariableDeclaration
+		; 
 
-WhileStatement:	while ( Expression ) Statement
+ForUpdate :	StatementExpressionList
+		; 
 
-WhileStatementNoShortIf:	while ( Expression ) StatementNoShortIf
+StatementExpressionList :	StatementExpression OCB  COMMA StatementExpression  CCB
+						; 
 
-DoStatement:	do Statement while ( Expression ) ;
+EnhancedForStatement :	FOR OB OCB VariableModifier CCB UnannType VariableDeclaratorId COLON Expression CB	Statement
+						; 
 
+EnhancedForStatementNoShortIf :	FOR OB OCB VariableModifier CCB UnannType VariableDeclaratorId COLON Expression CB StatementNoShortIf
+								; 
 
-ForStatement:	BasicForStatement
-EnhancedForStatement
+BreakStatement :	BREAK OBB Identifier CBB SEMICOLON
+				; 
 
-ForStatementNoShortIf:	BasicForStatementNoShortIf
-EnhancedForStatementNoShortIf
+ContinueStatement :	CONTINUE OBB Identifier CBB SEMICOLON
+					; 
 
-BasicForStatement:	for ( [ForInit] ; [Expression] ; [ForUpdate] ) Statement
-
-BasicForStatementNoShortIf:	for ( [ForInit] ; [Expression] ; [ForUpdate] ) StatementNoShortIf
-
-ForInit:	StatementExpressionList
-LocalVariableDeclaration
-
-ForUpdate:	StatementExpressionList
-
-StatementExpressionList:	StatementExpression { , StatementExpression}
-
-EnhancedForStatement:	for ( {VariableModifier} UnannType VariableDeclaratorId
-
-: Expression )	Statement
-
-EnhancedForStatementNoShortIf:	for ( {VariableModifier} UnannType VariableDeclaratorId
-
-: Expression )	StatementNoShortIf
-
-BreakStatement:	break [Identifier] ;
-
-ContinueStatement:	continue [Identifier] ;
-
-ReturnStatement:	return [Expression] ;
+ReturnStatement :	RETURN OBB Expression CBB SEMICOLON
+					; 
 
 
-ThrowStatement:	throw Expression ;
+ThrowStatement :	THROW Expression SEMICOLON
+				; 
 
-SynchronizedStatement:	synchronized ( Expression ) Block
+SynchronizedStatement :	SYNCHRONIZED OB Expression CB Block
+					; 
 
-TryStatement:	try Block Catches
-try Block [Catches] Finally
-TryWithResourcesStatement
+TryStatement :	TRY Block Catches
+			|	TRY Block OBB Catches CBB Finally
+			|	TryWithResourcesStatement
+			; 
 
-Catches:	CatchClause {CatchClause}
+Catches :	CatchClause OCB CatchClause CCB
+			; 
 
-CatchClause:	catch ( CatchFormalParameter ) Block
+CatchClause :	CATCH OB CatchFormalParameter CB Block
+			; 
 
-CatchFormalParameter:	{VariableModifier} CatchType VariableDeclaratorId
+CatchFormalParameter :	OCB VariableModifier CCB CatchType VariableDeclaratorId
+				; 
 
-CatchType:	UnannClassType { | ClassType}
+CatchType :	UnannClassType OCB  OR ClassType CCB
+			; 
 
-Finally:	finally
-Block
+Finally :	FINALLY
+		|	Block
+		; 
 
-TryWithResourcesStatement:	try ResourceSpecification Block [Catches] [Finally]
+TryWithResourcesStatement :	TRY ResourceSpecification Block OBB Catches CBB OBB Finally CBB
+				; 
 
-ResourceSpecification:	( ResourceList [ ; ] )
+ResourceSpecification :	OB ResourceList OBB  SEMICOLON  CBB CB
+				; 
 
-ResourceList:	Resource { ; Resource}
+ResourceList :	Resource OCB  SEMICOLON Resource CCB
+				; 
 
-Resource:	{VariableModifier} UnannType VariableDeclaratorId = Expression
+Resource :	OCB VariableModifier CCB UnannType VariableDeclaratorId EQUALS Expression
+				; 
 
 // Expressions 
 
 
-Primary:	PrimaryNoNewArray
-ArrayCreationExpression
+Primary :	PrimaryNoNewArray
+		|	ArrayCreationExpression
+		; 
 
-PrimaryNoNewArray:	Literal
-ClassLiteral
-this
-TypeName . this
-( Expression )
-ClassInstanceCreationExpression
-FieldAccess
-ArrayAccess
-MethodInvocation
-MethodReference
-
-ClassLiteral:	TypeName { [ ] } . class
-NumericType { [ ] } . class
-boolean { [ ] } . class
-void . class
-
-ClassInstanceCreationExpression:	UnqualifiedClassInstanceCreationExpression
-ExpressionName . UnqualifiedClassInstanceCreationExpression
-Primary . UnqualifiedClassInstanceCreationExpression
-
-UnqualifiedClassInstanceCreationExpression:	new [TypeArguments]
-ClassOrInterfaceTypeToInstantiate ( [ArgumentList] ) [ClassBody]
-
-ClassOrInterfaceTypeToInstantiate:	{Annotation} Identifier { . {Annotation} Identifier}
-[TypeArgumentsOrDiamond]
-
-TypeArgumentsOrDiamond:	TypeArguments
-<>
+AccessCommon :	FieldAccess
+			|	ArrayAccess
+			; 
 
 
-FieldAccess:	Primary . Identifier
-super . Identifier
-TypeName . super . Identifier
+PrimaryNoNewArray :	Literal
+				|	ClassLiteral
+				|	THIS
+				|	TypeName DOT THIS
+				|	OB Expression CB
+				|	ClassInstanceCreationExpression
+				|	AccessCommon
+				|	MethodInvocation
+				|	MethodReference
+				; 
 
-ArrayAccess:	ExpressionName [ Expression ]
-PrimaryNoNewArray [ Expression ]
+ClassLiteral :	TypeName OCB  OBB   CBB  CCB DOT CLASS
+			|	NumericType OCB  OBB   CBB  CCB DOT CLASS
+			|	BOOLEAN OCB  OBB   CBB  CCB DOT CLASS
+			|	VOID DOT CLASS
+			; 
 
-MethodInvocation:	MethodName ( [ArgumentList] )
-TypeName . [TypeArguments] Identifier ( [ArgumentList] )
-ExpressionName . [TypeArguments] Identifier ( [ArgumentList] )
-Primary . [TypeArguments] Identifier ( [ArgumentList] )
-super . [TypeArguments] Identifier ( [ArgumentList] )
-TypeName . super . [TypeArguments] Identifier ( [ArgumentList] )
+ClassInstanceCreationExpression :	UnqualifiedClassInstanceCreationExpression
+								|	ExpressionName DOT UnqualifiedClassInstanceCreationExpression
+								|	Primary DOT UnqualifiedClassInstanceCreationExpression
+								; 
 
-ArgumentList:	Expression { , Expression}
+UnqualifiedClassInstanceCreationExpression :	NEW OBB TypeArguments CBB
+										|	ClassOrInterfaceTypeToInstantiate OB OBB ArgumentList CBB CB OBB ClassBody CBB
+										; 
 
-MethodReference:	ExpressionName :: [TypeArguments] Identifier	ReferenceType :: [TypeArguments] Identifier	Primary :: [TypeArguments] 
-Identifier	super :: [TypeArguments] Identifier	TypeName . super :: [TypeArguments] Identifier	ClassType :: [TypeArguments] new	
-ArrayType :: new	ArrayCreationExpression:	new PrimitiveType DimExprs [Dims]
-new ClassOrInterfaceType DimExprs [Dims]
-new PrimitiveType Dims ArrayInitializer
-new ClassOrInterfaceType Dims ArrayInitializer
+ClassOrInterfaceTypeToInstantiate :	OCB Annotation CCB Identifier OCB DOT OCB Annotation CCB Identifier CCB
+								|	OBB TypeArgumentsOrDiamond CBB
+								; 
 
-DimExprs:	DimExpr {DimExpr}
-
-DimExpr:	{Annotation} [ Expression ]
-
-
-Expression:	LambdaExpression
-AssignmentExpression
-
-LambdaExpression:	LambdaParameters -> LambdaBody
-
-LambdaParameters:	Identifier
-( [FormalParameterList] )
-( InferredFormalParameterList )
-
-InferredFormalParameterList:	Identifier { , Identifier}
-
-LambdaBody:	Expression
-Block
-
-AssignmentExpression:	ConditionalExpression
-Assignment
-
-Assignment:	LeftHandSide AssignmentOperator Expression
-
-LeftHandSide:	ExpressionName
-FieldAccess
-ArrayAccess
-
-AssignmentOperator:	(one of)
-=
-*=
-/=
-%=
-+=
--=
-<<=
->>=
->>>=
-&=
-^=
-|=
+TypeArgumentsOrDiamond :	TypeArguments
+					|	LT GT
+					; 
 
 
-ConditionalExpression:	ConditionalOrExpression
+FieldAccess :	Primary DOT Identifier
+			|	SUPER DOT Identifier
+			|	TypeName DOT SUPER DOT Identifier
+			; 
 
-ConditionalOrExpression ? Expression : ConditionalExpression	ConditionalOrExpression ? Expression : LambdaExpression	
-ConditionalOrExpression:	ConditionalAndExpression
-ConditionalOrExpression || ConditionalAndExpression
-
-ConditionalAndExpression:	InclusiveOrExpression
-ConditionalAndExpression && InclusiveOrExpression
-
-InclusiveOrExpression:	ExclusiveOrExpression
-InclusiveOrExpression | ExclusiveOrExpression
-
-ExclusiveOrExpression:	AndExpression
-ExclusiveOrExpression ^ AndExpression
-
-AndExpression:	EqualityExpression
-AndExpression & EqualityExpression
-
-EqualityExpression:	RelationalExpression
-EqualityExpression == RelationalExpression
-EqualityExpression != RelationalExpression
-
-RelationalExpression:	ShiftExpression
-RelationalExpression < ShiftExpression
-RelationalExpression > ShiftExpression
-RelationalExpression <= ShiftExpression
-RelationalExpression >= ShiftExpression
-RelationalExpression instanceof ReferenceType
+ArrayAccess :	ExpressionName OBB  Expression  CBB
+			|	PrimaryNoNewArray OBB  Expression  CBB
+			; 
 
 
-ShiftExpression:	AdditiveExpression
-ShiftExpression << AdditiveExpression
-ShiftExpression >> AdditiveExpression
-ShiftExpression >>> AdditiveExpression
+MethodInvocation :	MethodName OB OBB ArgumentList CBB CB
+				|	TypeName DOT OBB TypeArguments CBB Identifier OB OBB ArgumentList CBB CB
+				|	ExpressionName DOT OBB TypeArguments CBB Identifier OB OBB ArgumentList CBB CB
+				|	Primary DOT OBB TypeArguments CBB Identifier OB OBB ArgumentList CBB CB
+				|	SUPER DOT OBB TypeArguments CBB Identifier OB OBB ArgumentList CBB CB
+				|	TypeName DOT SUPER DOT OBB TypeArguments CBB Identifier OB OBB ArgumentList CBB CB
+				; 
+				
 
-AdditiveExpression:	MultiplicativeExpression
-AdditiveExpression + MultiplicativeExpression
-AdditiveExpression - MultiplicativeExpression
+ArgumentList :	Expression OCB  COMMA Expression CCB
+				; 
+								
+MethodReference :	ExpressionName COLON COLON OBB TypeArguments CBB Identifier
+				|	ReferenceType COLON COLON OBB TypeArguments CBB Identifier
+				|	Primary COLON COLON OBB TypeArguments CBB Identifier
+				|	SUPER COLON COLON OBB TypeArguments CBB Identifier
+				|	TypeName DOT SUPER COLON COLON OBB TypeArguments CBB Identifier
+				|	ClassType COLON COLON OBB TypeArguments CBB NEW	
+				|	ArrayType COLON COLON NEW	
+				;
 
-MultiplicativeExpression:	UnaryExpression
-MultiplicativeExpression * UnaryExpression
-MultiplicativeExpression / UnaryExpression
-MultiplicativeExpression % UnaryExpression
+ArrayCreationExpression :	NEW PrimitiveType DimExprs OBB Dims CBB
+						|	NEW ClassType DimExprs OBB Dims CBB
+						|	NEW PrimitiveType Dims ArrayInitializer
+						|	NEW ClassType Dims ArrayInitializer
+						;
 
-UnaryExpression:	PreIncrementExpression
-PreDecrementExpression
-+ UnaryExpression
-- UnaryExpression
-UnaryExpressionNotPlusMinus
+DimExprs :	DimExpr OCB DimExpr CCB
+			; 
 
-PreIncrementExpression:	++ UnaryExpression
-
-PreDecrementExpression:	-- UnaryExpression
-
-UnaryExpressionNotPlusMinus:	PostfixExpression
-~ UnaryExpression
-! UnaryExpression
-CastExpression
-
-PostfixExpression:	Primary
-ExpressionName
-PostIncrementExpression
-PostDecrementExpression
+DimExpr :	OCB Annotation CCB OBB  Expression  CBB
+			; 
 
 
-PostIncrementExpression:	PostfixExpression ++
+Expression :	LambdaExpression
+		|	AssignmentExpression
+		; 
 
-PostDecrementExpression:	PostfixExpression --
+LambdaExpression :	LambdaParameters REF LambdaBody
+				; 
 
-CastExpression:	( PrimitiveType ) UnaryExpression
-( ReferenceType {AdditionalBound} ) UnaryExpressionNotPlusMinus
-( ReferenceType {AdditionalBound} ) LambdaExpression
+LambdaParameters :	Identifier
+				|	OB OBB FormalParameterList CBB CB
+				|	OB InferredFormalParameterList CB
+				; 
 
-ConstantExpression:	Expression
+InferredFormalParameterList :	Identifier OCB  COMMA Identifier CCB
+							; 
+
+LambdaBody :	Expression
+		|	Block
+		;
+
+AssignmentExpression :	ConditionalExpression
+					|	Assignment
+					; 
+
+Assignment :	LeftHandSide AssignmentOperator Expression
+			; 
 
 
 
+LeftHandSide :	ExpressionName
+				| AccessCommon
+			; 
 
 
+
+AssignmentOperator :	EQUALS
+				|	MUL EQUALS
+				|	DIV EQUALS
+				|	MOD EQUALS
+				|	PLUS EQUALS
+				|	MINUS EQUALS
+				|	LT LT EQUALS
+				|	GT GT EQUALS
+				|	GT GT GT EQUALS
+				|	AND  EQUALS
+				|	EXP EQUALS
+				|	OR EQUALS
+
+ConditionalExpression :	ConditionalOrExpression
+					|	ConditionalOrExpression QUESTION Expression COLON ConditionalExpression	
+					|	ConditionalOrExpression QUESTION Expression COLON LambdaExpression	
+					; 
+
+ConditionalOrExpression :	ConditionalAndExpression
+						|	ConditionalOrExpression OR OR ConditionalAndExpression
+
+
+ConditionalAndExpression :	InclusiveOrExpression
+						|	ConditionalAndExpression AND AND InclusiveOrExpression
+						; 
+
+InclusiveOrExpression : 	ExclusiveOrExpression
+					|	InclusiveOrExpression OR ExclusiveOrExpression
+					; 
+
+ExclusiveOrExpression :	AndExpression
+					|	ExclusiveOrExpression EXP AndExpression
+					; 
+
+AndExpression :	EqualityExpression
+			|	AndExpression AND  EqualityExpression
+			; 
+
+EqualityExpression :	RelationalExpression
+					|	EqualityExpression  EQUALS RelationalExpression
+					|	EqualityExpression NOT EQUALS RelationalExpression
+					; 
+
+RelationalExpression :	ShiftExpression
+					|	RelationalExpression LT ShiftExpression
+					|	RelationalExpression GT ShiftExpression
+					|	RelationalExpression LT EQUALS ShiftExpression
+					|	RelationalExpression GT EQUALS ShiftExpression
+					|	RelationalExpression INSTANCEOF ReferenceType
+					; 
+
+
+ShiftExpression :	AdditiveExpression
+				|	ShiftExpression LT LT AdditiveExpression
+				|	ShiftExpression GT GT AdditiveExpression
+				|	ShiftExpression GT GT GT AdditiveExpression
+				; 
+
+AdditiveExpression :	MultiplicativeExpression
+				|	AdditiveExpression PLUS MultiplicativeExpression
+				|	AdditiveExpression MINUS MultiplicativeExpression
+				; 
+
+MultiplicativeExpression :	UnaryExpression
+						|	MultiplicativeExpression MUL UnaryExpression
+						|	MultiplicativeExpression DIV UnaryExpression
+						|	MultiplicativeExpression MOD UnaryExpression
+						;
+
+UnaryExpression :	PreIncrementExpression
+				|	PreDecrementExpression
+				|	PLUS UnaryExpression
+				|	MINUS UnaryExpression
+				|	UnaryExpressionNotPlusMinus
+				; 
+
+PreIncrementExpression :	PLUS PLUS UnaryExpression
+					; 
+
+PreDecrementExpression :	MINUS MINUS UnaryExpression
+					; 
+
+UnaryExpressionNotPlusMinus :	PostfixExpression
+							|	TILDE UnaryExpression
+							|	NOT UnaryExpression
+							|	CastExpression
+							;
+
+PostfixExpression :	Primary
+				|	ExpressionName
+				|	PostIncrementExpression
+				|	PostDecrementExpression
+				; 
+
+PostIncrementExpression :	PostfixExpression PLUS PLUS
+						; 
+
+PostDecrementExpression :	PostfixExpression MINUS MINUS
+						; 
+
+CastExpression :	OB PrimitiveType CB UnaryExpression
+			|	OB ReferenceType OCB AdditionalBound CCB CB UnaryExpressionNotPlusMinus
+			|	OB ReferenceType OCB AdditionalBound CCB CB LambdaExpression
+			; 
 
 
 %%
 
+int yyerror(char *msg) {
+	printf("Invalid Expression\n");
+	return 1;
+}
+
+void main() {
+	yyin = fopen("input.java", "r");
+	do{
+		if( yyparse() ) {
+			printf("\nFailure");
+			exit(0);
+		}
+	} while( !feof(yyin) );
+	printf("Success");
+}
