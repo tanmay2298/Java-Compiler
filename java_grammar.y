@@ -21,6 +21,7 @@
 %left DOT 
 %left OBB OB OCB 
 %expect 25
+%define parse.trace
 %%
 Goal: CompilationUnit
 	; 
@@ -190,8 +191,8 @@ MethodHeader:	Modifiers Type MethodDeclarator Throws
 			|	Modifiers Type MethodDeclarator
 			|	Type MethodDeclarator Throws
 			|	Type MethodDeclarator
-			|	Modifiers VOID Identifier MethodDeclarator Throws
-			|	Modifiers VOID Identifier MethodDeclarator
+			|	Modifiers VOID MethodDeclarator Throws
+			|	Modifiers VOID MethodDeclarator
 			|	VOID Identifier MethodDeclarator Throws
 			|	VOID Identifier MethodDeclarator
 			; 
@@ -626,6 +627,7 @@ int yyerror(char *msg) {
 
 void main() {
 	yyin = fopen("input.java", "r");
+	//yydebug = 1 ; 
 	do{
 		if( yyparse() ) {
 			printf("\nFailure");
