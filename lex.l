@@ -7,12 +7,12 @@
 
 %%
 
+"static" {printf("%s\n", yytext); return static;}
 "." {printf("%s\n", yytext); return DOT;}
 "," {printf("%s\n", yytext); return COMMA;}
 ";" {printf("%s\n", yytext); return SEMICOLON;}
 "package" {printf("%s\n", yytext); return package;}
 "import" {printf("%s\n", yytext); return import;}
-"static" {printf("%s\n", yytext); return static;}
 "void" {printf("%s\n", yytext); return void;}
 "final" {printf("%s\n", yytext); return final;}
 "+" {printf("%s\n", yytext); return PLUS;}

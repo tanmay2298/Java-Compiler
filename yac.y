@@ -10,21 +10,6 @@
 %token DOT COMMA SEMICOLON package import static void final PLUS MULTIPLY DIVIDE MINUS MODULUS POWER this case default byte boolean short char int float double enum long public private protected abstract native synchronized transient volatile strictfp LCB RCB LSB RSB LRB RRB QUESTIONMARK AND OR LEFTSHIFT RIGHTSHIFT UNSIGNED_RIGHTSHIFT LT LTE GT GTE for if else switch while do break continue COLON throw finally EQUALS ATTHERATE TILD catch RETURN IDENTIFIER throws interface new try super instanceof NOT FloatingPointLiteral IntegerLiteral CharacterLiteral BooleanLiteral assert StringLiteral NullLiteral extends class implements
 
 %% 
-
-// -----------------------------------------------
-Identifier : IDENTIFIER
-			;
-QualifiedIdentifier : Identifier A1
-			;
-A1 : DOT Identifier A1
-			| 
-			;
-QualifiedIdentifierList : QualifiedIdentifier A2
-			;
-A2 : COMMA QualifiedIdentifier A2
-			|
-			;
-
 // -----------------------------------------------
 CompilationUnit : A3 A4 A5
 			;
@@ -79,6 +64,21 @@ A13 : extends TypeList
 			;
 AnnotationTypeDeclaration : ATTHERATE interface Identifier AnnotationTypeBody
 			;
+
+// -----------------------------------------------
+Identifier : IDENTIFIER
+			;
+QualifiedIdentifier : Identifier A1
+			;
+A1 : DOT Identifier A1
+			| 
+			;
+QualifiedIdentifierList : QualifiedIdentifier A2
+			;
+A2 : COMMA QualifiedIdentifier A2
+			|
+			;
+
 
 // -----------------------------------------------
 Type : BasicType A14
