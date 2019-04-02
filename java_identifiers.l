@@ -15,7 +15,9 @@
 "-" { printf("\n - "); return MINUS ; }
 "*" { printf("\n * "); return CMUL ; }
 "/" { printf("\n / "); return CDIV ; }
+"||" { printf("\n DOR "); return DOR ; }
 "|" { printf("\n OR "); return OR ; }
+"&&" { printf("\n && "); return DAND ; }
 "&" { printf("\n & "); return AND ; }
 "<<" { printf("\n << "); return SHIFTLEFT ; }
 ">>>" { printf("\n >>> "); return USHIFTRIGHT ; }

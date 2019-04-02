@@ -6,25 +6,31 @@
 	extern FILE *yyin;
 %}
 
-%token DOT COMMA SEMICOLON CBYTE CINT SHORT LONG CHAR FLOAT DOUBLE EXTENDS SUPER CLASS PUBLIC PROTECTED PRIVATE ABSTRACT IMPORT STATIC FINAL FINALLY VOLATILE TRANSIENT BOOLEAN IMPLEMENTS VOID THIS THROWS INTERFACE DEFAULT INSTANCEOF QUESTION IF ELSE NEW CASE SWITCH Identifier INTEGER FLOATING CNULL FOR WHILE OCB OBB OB CCB CBB CB CONTINUE BREAK COLON RETURN CATCH SYNCHRONIZED THROW DO TRY PACKAGE NATIVE STRING
+%token COMMA SEMICOLON CBYTE CINT SHORT LONG CHAR FLOAT DOUBLE EXTENDS SUPER CLASS PUBLIC PROTECTED PRIVATE ABSTRACT IMPORT STATIC FINAL FINALLY VOLATILE TRANSIENT BOOLEAN IMPLEMENTS VOID THIS THROWS INTERFACE DEFAULT INSTANCEOF QUESTION IF ELSE NEW CASE SWITCH INTEGER FLOATING CNULL FOR WHILE CCB CBB CB CONTINUE BREAK COLON RETURN CATCH SYNCHRONIZED THROW DO TRY PACKAGE NATIVE STRING
 %left LT GT EQUALS
 %left EXP MOD
 %left PLUS MINUS
 %left NOT TILDE
 %left AND OR
+%left DAND DOR
 %left CMUL CDIV
 %left SHIFTLEFT SHIFTRIGHT 
 %left USHIFTRIGHT
 %left INCREMENT DECREMENT
-
+%left Identifier
+%left DOT 
+%left OBB OB OCB 
+%expect 25
 %%
 Goal: CompilationUnit
 	; 
 
+Name:	Identifier DOT Name
+	|	Identifier
+	; 
+
 Literal:	INTEGER
 		|	FLOATING
-		|	BOOLEAN
-		|	Identifier
 		|	CNULL
 		;
 
@@ -71,13 +77,7 @@ ArrayType:	PrimitiveType OBB CBB
 		|	ArrayType OBB CBB
 		; 
 
-Name:	QualifiedName
-	|	Identifier
-	; 
 
-
-QualifiedName:	Name DOT Identifier
-			; 
 
 CompilationUnit:	PackageDeclaration ImportDeclarations TypeDeclarations
 				| ImportDeclarations TypeDeclarations
@@ -104,11 +104,11 @@ SingleTypeImportDeclaration:	IMPORT Name SEMICOLON
 					; 
 
 TypeImportOnDemandDeclaration:	IMPORT Name DOT CMUL SEMICOLON
-
+					; 
 TypeDeclaration:	ClassDeclaration
 				|	InterfaceDeclaration
 				|	SEMICOLON 
-
+				; 
 Modifiers:	Modifier
 		|	Modifiers Modifier
 		; 
@@ -574,11 +574,11 @@ InclusiveOrExpression:	ExclusiveOrExpression
 					; 
 
 ConditionalAndExpression:	InclusiveOrExpression
-						|	ConditionalAndExpression AND AND InclusiveOrExpression
+						|	ConditionalAndExpression DAND InclusiveOrExpression
 						; 
 
 ConditionalOrExpression:	ConditionalAndExpression
-						|	ConditionalOrExpression OR OR ConditionalAndExpression
+						|	ConditionalOrExpression DOR ConditionalAndExpression
 						; 
 
 ConditionalExpression:	ConditionalOrExpression
@@ -589,10 +589,7 @@ AssignmentExpression:	ConditionalExpression
 					|	Assignment
 					; 
 
-Assignment:	LeftHandSide AssignmentOperator AssignmentExpression
-			; 
-
-LeftHandSide:	Name
+Assignment:	Name AssignmentOperator AssignmentExpression
 			; 
 
 
