@@ -6,16 +6,20 @@
 %}
 
 %% 
-"->" { printf("\n -> "); return REF ; }
 "." { printf("\n . "); return DOT ; }
 ";" { printf("\n ; "); return SEMICOLON ; }
 ":" { printf("\n : "); return COLON ; }
+"++" { printf("\n ++ "); return INCREMENT ; }
+"--" { printf("\n -- "); return DECREMENT ; }
 "+" { printf("\n + "); return PLUS ; }
 "-" { printf("\n - "); return MINUS ; }
-"*" { printf("\n * "); return MUL ; }
-"/" { printf("\n / "); return DIV ; }
+"*" { printf("\n * "); return CMUL ; }
+"/" { printf("\n / "); return CDIV ; }
 "|" { printf("\n OR "); return OR ; }
 "&" { printf("\n & "); return AND ; }
+"<<" { printf("\n << "); return SHIFTLEFT ; }
+">>>" { printf("\n >>> "); return USHIFTRIGHT ; }
+">>" { printf("\n >> "); return SHIFTRIGHT ; }
 "<" { printf("\n < "); return LT ; }
 ">" { printf("\n > "); return GT ; }
 "~" { printf("\n ~ "); return TILDE ; }
@@ -26,11 +30,11 @@
 "%" { printf("\n Modulus "); return MOD ; }
 
 "byte" { printf("\n byte "); return CBYTE ; }
+"String" { printf("\n string "); return STRING ; }
 "int" { printf("\n int "); return CINT ; }
 "short" { printf("\n short "); return SHORT ; }
 "long" { printf("\n long "); return LONG ; }
 "char" { printf("\n char "); return CHAR ; }
-"enum" { printf("\n enum "); return ENUM ;}
 "break" { printf("\n break "); return BREAK ;}
 "continue" { printf("\n continue "); return CONTINUE ;}
 "float" { printf("\n float "); return FLOAT ; }
@@ -55,7 +59,6 @@
 "finally" { printf("\n finally "); return FINALLY ; }
 "volatile" { printf("\n volatile "); return VOLATILE ; }
 "transient" { printf("\n transient "); return TRANSIENT ; }
-"strictpf" { printf("\n strictpf "); return STRICTPF ; }
 "return" {  printf("\n return "); return RETURN ; }
 "implements" { printf("\n implements "); return IMPLEMENTS ; }
 "instanceof" { printf("\n instanceof "); return INSTANCEOF ; }
@@ -67,7 +70,6 @@
 "new" { printf("\n new "); return NEW ; }
 "if" { printf("\n if "); return IF; }
 "else" { printf("\n else "); return ELSE ; }
-"assert" { printf("\n assert "); return ASSERT ; }
 "case" { printf("\n case "); return CASE ; }
 "switch" { printf("\n switch "); return SWITCH ; }
 "for" { printf("\n for "); return FOR ; }
@@ -81,11 +83,10 @@
 ")" { printf("\n ) "); return CB ; }
 "}" { printf("\n } "); return CCB ; }
 "]" { printf("\n ] "); return CBB ; }
-"@" { printf("\n @ "); return ATRATE ; }
  
 [0-9]+ { printf("\n %s" , yytext) ; return INTEGER ; }
 [0-9]+"."[0-9]+ { printf("\n %s" , yytext) ; return FLOATING ; }
-[a-zA-Z]+ { printf("\n %s" , yytext) ; return ID ; }
+[a-zA-Z]+ { printf("\n %s" , yytext) ; return Identifier ; }
 
 %%
 int yywrap() {
