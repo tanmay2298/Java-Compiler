@@ -6,6 +6,8 @@
 %}
 
 %% 
+"//".*\n { printf("Ignore Comments "); } 
+"/*".*"*/" { printf("Ignore Comments "); } 
 "." { printf("\n . "); return DOT ; }
 ";" { printf("\n ; "); return SEMICOLON ; }
 ":" { printf("\n : "); return COLON ; }
