@@ -74,8 +74,12 @@ InterfaceType:	ClassOrInterfaceType
 				; 
 
 ArrayType:	PrimitiveType OBB CBB
+		| 	PrimitiveType OBB error { printf("\n Syntax Error, missing paranthesis ") ; }
+		| 	PrimitiveType error CBB { printf("\n Syntax Error, missing paranthesis ") ; }
 		|	Name OBB CBB
+		|	Name OBB error { printf("\n Syntax Error, missing paranthesis ") ; }
 		|	ArrayType OBB CBB
+		| 	ArrayType OBB error { printf("\n Syntax Error, missing paranthesis ") ; }
 		; 
 
 
@@ -102,9 +106,14 @@ ImportDeclaration:	SingleTypeImportDeclaration
 				; 
 
 SingleTypeImportDeclaration:	IMPORT Name SEMICOLON
+					|	IMPORT Name error { printf("\n Missing semicolon ") ; }
+					|	IMPORT error SEMICOLON { printf("\n Missing Identifier ") ; }
 					; 
 
 TypeImportOnDemandDeclaration:	IMPORT Name DOT CMUL SEMICOLON
+					|	IMPORT Name DOT CMUL error { printf("\n Missing semicolon ") ; }
+					|	IMPORT Name error CMUL SEMICOLON { printf("\n Missing . ") ; }
+					|	IMPORT error DOT CMUL SEMICOLON { printf("\n Missing Identifier ") ; }
 					; 
 TypeDeclaration:	ClassDeclaration
 				|	InterfaceDeclaration
@@ -166,18 +175,23 @@ ClassMemberDeclaration:	FieldDeclaration
 
 FieldDeclaration:	Modifiers Type VariableDeclarators SEMICOLON
 					|	Type VariableDeclarators SEMICOLON
+					|	Modifiers Type VariableDeclarators error { printf(" \n Missing semicolon ") ; }
+					|	Type VariableDeclarators error { printf(" \n Missing semicolon ") ; }
 					; 
 
 VariableDeclarators:	VariableDeclarator
 					|	VariableDeclarators COMMA VariableDeclarator
+					|	VariableDeclarators COMMA error  { printf(" \n Missing variable, after comma ") ; }
 					; 
 
 VariableDeclarator:	VariableDeclaratorId
 				|	VariableDeclaratorId EQUALS VariableInitializer
+				|	VariableDeclaratorId EQUALS error { printf(" \n Missing variable, after equals ") ; }
 				; 
 
 VariableDeclaratorId:	Identifier
 					|	VariableDeclaratorId OBB CBB
+					|	VariableDeclaratorId OBB error { printf(" \n Missing closing bracket "); }
 					; 
 
 VariableInitializer:	Expression
@@ -200,6 +214,7 @@ MethodHeader:	Modifiers Type MethodDeclarator Throws
 MethodDeclarator:	Identifier OB FormalParameterList CB
 				|	Identifier OB CB
 				|	MethodDeclarator OBB CBB
+				|	Identifier OB error {printf("\n Missing parameters or bracket ") ; }
 				; 
 
 FormalParameterList:	FormalParameter
@@ -241,6 +256,8 @@ ExplicitConstructorInvocation:	THIS OB ArgumentList CB SEMICOLON
 							|	THIS OB CB SEMICOLON
 							|	SUPER OB ArgumentList CB SEMICOLON
 							|	SUPER OB CB SEMICOLON
+							|	SUPER OB error { printf("\n missing semicolon"); }
+							|	THIS OB error { printf("\n missing semicolon"); }
 							; 
 
 
@@ -248,6 +265,7 @@ InterfaceDeclaration:	Modifiers INTERFACE Identifier ExtendsInterfaces Interface
 						| INTERFACE Identifier ExtendsInterfaces InterfaceBody
 						| Modifiers INTERFACE Identifier InterfaceBody
 						| INTERFACE Identifier InterfaceBody
+						| Modifiers INTERFACE error { printf("\n Bad interface declaration ");}
 						; 
 
 ExtendsInterfaces:	EXTENDS InterfaceType
@@ -256,6 +274,7 @@ ExtendsInterfaces:	EXTENDS InterfaceType
 
 InterfaceBody:	OCB InterfaceMemberDeclarations CCB
 				|	OCB CCB
+				|	OCB error {printf("\n Error in Interface Body declaration "); }
 				; 
 
 InterfaceMemberDeclarations:	InterfaceMemberDeclaration
@@ -269,12 +288,15 @@ ConstantDeclaration:	FieldDeclaration
 					; 
 
 AbstractMethodDeclaration:	MethodHeader SEMICOLON
+							| MethodHeader error { printf("\n Missing semicolon") ; }
 							; 
 
 ArrayInitializer:	OCB VariableInitializers COMMA CCB
 					| OCB COMMA CCB 
 					| OCB VariableInitializers CCB 
 					| OCB CCB 
+					| OCB error {printf("\n Incorrect Array Initialization "); }
+
 
 VariableInitializers:	VariableInitializer
 					|	VariableInitializers COMMA VariableInitializer
@@ -330,12 +352,15 @@ EmptyStatement: SEMICOLON
 				; 
 
 LabeledStatement:	Identifier COLON Statement
+					| Identifier COLON error {printf("\n missing statement ") ; }
 					; 
 
 LabeledStatementNoShortIf:	Identifier COLON StatementNoShortIf
+						| Identifier COLON error {printf("\n missing statement ") ; }
 					; 
 
 ExpressionStatement:	StatementExpression SEMICOLON
+					|	StatementExpression error { printf("\n Missing semicolon ") ; }
 					; 
 
 StatementExpression:	Assignment
@@ -347,21 +372,41 @@ StatementExpression:	Assignment
 					|	ClassInstanceCreationExpression
 					; 
 IfThenStatement:	IF OB Expression CB Statement
-					; 
+					|	IF OB error CB Statement {printf("\n Incorrect Expression "); }
+					|	IF error Expression CB Statement { printf("\n Missing bracket"); }
+					|	IF OB Expression error Statement { printf("\n Missing bracket"); }
+					|	IF OB Expression CB error { printf("\n Missing statement"); }
+ 					; 
 
 IfThenElseStatement:	IF OB Expression CB StatementNoShortIf ELSE Statement
+					|	IF OB error CB StatementNoShortIf ELSE Statement {printf("\n Incorrect Expression "); }
+					|	IF error Expression CB StatementNoShortIf ELSE Statement { printf("\n Missing bracket"); }
+					|	IF OB Expression error StatementNoShortIf ELSE Statement { printf("\n Missing bracket"); }
+					|	IF error Expression CB error ELSE Statement{ printf("\n Missing statement"); }
+					| 	IF OB Expression CB StatementNoShortIf ELSE error{ printf("\n Missing else statement"); }
+					| 	IF OB Expression CB StatementNoShortIf error Statement{ printf("\n Missing else "); }
 						; 
 
 IfThenElseStatementNoShortIf:	IF OB Expression CB StatementNoShortIf ELSE StatementNoShortIf
+					|	IF OB error CB StatementNoShortIf ELSE StatementNoShortIf {printf("\n Incorrect Expression "); }
+					|	IF error Expression CB StatementNoShortIf ELSE StatementNoShortIf { printf("\n Missing bracket"); }
+					|	IF OB Expression error StatementNoShortIf ELSE StatementNoShortIf  { printf("\n Missing bracket"); }
+					|	IF error Expression CB error ELSE StatementNoShortIf { printf("\n Missing statement"); }
+					| 	IF OB Expression CB StatementNoShortIf ELSE error{ printf("\n Missing else statement"); }
+					| 	IF OB Expression CB StatementNoShortIf error StatementNoShortIf { printf("\n Missing else "); }
+						; 
 						; 
 
 SwitchStatement:	SWITCH OB Expression CB SwitchBlock
+					|	SWITCH error Expression CB SwitchBlock { printf("\n Missing bracket") ; }
+					|	SWITCH OB Expression error SwitchBlock { printf("\n Missing bracket") ; }
 					; 
 
 SwitchBlock:	OCB SwitchBlockStatementGroups SwitchLabels CCB	
 				| OCB SwitchBlockStatementGroups CCB	
 				| OCB SwitchLabels CCB	
 				| OCB CCB 
+				| OCB error { printf ("Missing closing bracket"); }	
 				;
 
 SwitchBlockStatementGroups:	SwitchBlockStatementGroup
@@ -375,10 +420,14 @@ SwitchLabels:	SwitchLabel
 			;  					
 
 SwitchLabel:	CASE ConstantExpression COLON
+			|	CASE ConstantExpression error {printf (" \n missing colon") ; }
 			|	DEFAULT COLON
+			|	DEFAULT error {printf (" \n missing colon") ; }
 			; 
 
 WhileStatement:	WHILE OB Expression CB Statement
+				|	WHILE error Expression CB Statement { printf (" missing bracket"); }
+				|	WHILE OB Expression error Statement { printf (" missing bracket"); }
 				; 
 
 WhileStatementNoShortIf:	WHILE OB Expression CB StatementNoShortIf
@@ -393,6 +442,8 @@ ForStatement:	FOR OB ForInit SEMICOLON Expression SEMICOLON ForUpdate CB Stateme
 			| FOR OB SEMICOLON SEMICOLON ForUpdate CB Statement
 			| FOR OB SEMICOLON Expression SEMICOLON CB Statement
 			| FOR OB SEMICOLON SEMICOLON CB Statement
+			| FOR OB ForInit error Expression SEMICOLON ForUpdate CB Statement { printf("\n Missing semicolon"); }
+			| FOR OB ForInit SEMICOLON Expression error ForUpdate CB Statement { printf("\n Missing semicolon"); }	
 			; 
 
 ForStatementNoShortIf:	FOR OB ForInit SEMICOLON Expression SEMICOLON ForUpdate CB StatementNoShortIf
@@ -403,6 +454,8 @@ ForStatementNoShortIf:	FOR OB ForInit SEMICOLON Expression SEMICOLON ForUpdate C
 					| FOR OB SEMICOLON SEMICOLON ForUpdate CB StatementNoShortIf
 					| FOR OB SEMICOLON Expression SEMICOLON CB StatementNoShortIf
 					| FOR OB SEMICOLON SEMICOLON CB StatementNoShortIf
+					| FOR OB ForInit error Expression SEMICOLON ForUpdate CB StatementNoShortIf { printf("\n Missing semicolon"); }
+					| FOR OB ForInit SEMICOLON Expression error ForUpdate CB StatementNoShortIf { printf("\n Missing semicolon"); }	
 					; 
 
 ForInit:	StatementExpressionList
@@ -418,15 +471,19 @@ StatementExpressionList:	StatementExpression
 
 BreakStatement:	BREAK Identifier SEMICOLON
 				| BREAK SEMICOLON
+				|	BREAK Identifier error {printf (" Missing semicolon ") ; }
 				; 
 ContinueStatement:	CONTINUE Identifier SEMICOLON
 				| CONTINUE SEMICOLON
+				|	CONTINUE Identifier error {printf (" Missing semicolon ") ; }
 				; 
 ReturnStatement:	RETURN Expression SEMICOLON
 				| RETURN SEMICOLON
+				|	RETURN Expression error {printf (" Missing semicolon ") ; }
 				; 
 
 ThrowStatement:	THROW Expression SEMICOLON
+				| THROW Expression error {printf (" Missing semicolon ") ; }
 				; 
 SynchronizedStatement:	SYNCHRONIZED OB Expression CB Block
 				; 
@@ -633,7 +690,7 @@ int yyerror(char *msg) {
 
 void main() {
 	yyin = fopen("input.java", "r");
-	yydebug = 1 ; 
+	//yydebug = 1 ; 
 	do{
 		if( yyparse() ) {
 			printf("\nFailure");
