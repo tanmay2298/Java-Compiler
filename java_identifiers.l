@@ -6,8 +6,9 @@
 %}
 
 %% 
-"//".*\n { printf("Ignore Comments "); } 
-"/*".*"*/" { printf("Ignore Comments "); } 
+"//".*\n { printf("\n Ignore Comments "); } 
+"/*".*"*/" { printf("\n Ignore Comments "); } 
+(" "|\t|\n)+	{printf( "\n White space ") ; } 
 "." { printf("\n . "); return DOT ; }
 ";" { printf("\n ; "); return SEMICOLON ; }
 ":" { printf("\n : "); return COLON ; }
@@ -32,6 +33,7 @@
 "?" { printf("\n ? "); return QUESTION ; }
 "=" { printf("\n = "); return EQUALS ; }
 "%" { printf("\n Modulus "); return MOD ; }
+"\"".*"\"" { printf("\n literal "); return LITERAL ;  }
 
 "byte" { printf("\n byte "); return CBYTE ; }
 "String" { printf("\n string "); return STRING ; }
@@ -90,7 +92,7 @@
  
 [0-9]+ { printf("\n %s" , yytext) ; return INTEGER ; }
 [0-9]+"."[0-9]+ { printf("\n %s" , yytext) ; return FLOATING ; }
-[a-zA-Z]+ { printf("\n %s" , yytext) ; return Identifier ; }
+[a-zA-Z][a-zA-Z0-9]* { printf("\n %s" , yytext) ; return Identifier ; }
 
 %%
 int yywrap() {
