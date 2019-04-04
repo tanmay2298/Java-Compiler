@@ -9,7 +9,7 @@
 "//".*\n { printf("\n Ignore Comments "); } 
 "/*".*"*/" { printf("\n Ignore Comments "); } 
 (" "|\t|\n)+	{printf( "\n White space ") ; } 
-"." { printf("\n . "); return DOT ; }
+"." { printf("\n . "); return DOT ;}
 ";" { printf("\n ; "); return SEMICOLON ; }
 ":" { printf("\n : "); return COLON ; }
 "++" { printf("\n ++ "); return INCREMENT ; }

@@ -209,6 +209,7 @@ MethodHeader:	Modifiers Type MethodDeclarator Throws
 			|	Modifiers VOID MethodDeclarator
 			|	VOID Identifier MethodDeclarator Throws
 			|	VOID Identifier MethodDeclarator
+			|	VOID Identifier OB CB 
 			; 
 
 MethodDeclarator:	Identifier OB FormalParameterList CB

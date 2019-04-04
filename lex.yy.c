@@ -907,7 +907,7 @@ YY_RULE_SETUP
 case 4:
 YY_RULE_SETUP
 #line 12 "java_identifiers.l"
-{ printf("\n . "); return DOT ; }
+{ printf("\n . "); return DOT ;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
