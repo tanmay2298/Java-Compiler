@@ -284,8 +284,8 @@ Block:	OCB BlockStatements CCB
 		| OCB CCB 
 		; 
 
-BlockStatements:	BlockStatement
-				|	BlockStatements BlockStatement
+BlockStatements:	BlockStatement BlockStatements
+				| 	BlockStatement
 				; 
 
 BlockStatement:	LocalVariableDeclarationStatement
@@ -596,7 +596,7 @@ AssignmentExpression:	ConditionalExpression
 					|	Assignment
 					; 
 
-Assignment:	Name AssignmentOperator AssignmentExpression
+Assignment:	Name AssignmentOperator ConditionalExpression
 			; 
 
 
