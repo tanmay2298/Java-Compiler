@@ -689,9 +689,10 @@ int yyerror(char *msg) {
 	return 1;
 }
 
-void main() {
-	yyin = fopen("input.java", "r");
-	//yydebug = 1 ; 
+int main (int argc, char *argv[]){
+
+    // parsing
+    yyin = fopen(argv[1], "r");
 	do{
 		if( yyparse() ) {
 			printf("\nFailure");
@@ -699,4 +700,6 @@ void main() {
 		}
 	} while( !feof(yyin) );
 	printf("Success");
+    
+    return 0;
 }
